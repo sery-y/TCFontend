@@ -5,6 +5,7 @@ import {
   AlertCircle,
   CheckCircle,
   Settings,
+  Book,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
@@ -31,7 +32,7 @@ export default function AgentSidebar() {
           onClick={() => navigate("/agent/tickets")}
         >
           <Ticket className="h-5 w-5" />
-          My Tickets
+          Tickets
         </Button>
 
         <Button
@@ -40,25 +41,16 @@ export default function AgentSidebar() {
           onClick={() => navigate("/agent/unread")}
         >
           <Inbox className="h-5 w-5" />
-          Unread Replies
+          Untreated tickets
         </Button>
 
         <Button
           variant="ghost"
           className="w-full justify-start gap-3"
-          onClick={() => navigate("/agent/overdue")}
+          onClick={() => navigate("/agent/knowledgebase")}
         >
-          <AlertCircle className="h-5 w-5 text-red-500" />
-          Overdue
-        </Button>
-
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-3"
-          onClick={() => navigate("/agent/resolved")}
-        >
-          <CheckCircle className="h-5 w-5 text-green-500" />
-          Resolved
+          <Book className="h-5 w-5 " />
+          knowledgebase
         </Button>
 
         <Separator className="my-4" />

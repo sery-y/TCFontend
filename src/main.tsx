@@ -15,6 +15,10 @@ import DashboardClient from "./pages/client/DashboardClient";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import TicketFormModal from "./components/ClientForm";
+import TicketsPage from "./pages/TicketPage";
+import UnreadTicketsPage from "./pages/UnreadTicketsPage";
+
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/login", element: <Login /> },
@@ -29,13 +33,21 @@ const router = createBrowserRouter([
   {
     path: "/agent",
     element: <AgentLayout />,
-    children: [{ path: "dashboard", element: <DashboardAgent /> }],
+    children: [
+      { path: "dashboard", element: <DashboardAgent /> },
+      { path: "tickets", element: <TicketsPage /> },
+    ],
   },
 
   {
     path: "/client",
     element: <ClientLayout />,
-    children: [{ path: "dashboard", element: <DashboardClient /> }],
+    children: [
+      { path: "dashboard", element: <DashboardClient /> },
+      { path: "tickets", element: <TicketsPage /> },
+      { path: "tickets/new", element: <DashboardClient /> },
+      { path: "unread", element: <UnreadTicketsPage /> }, //
+    ],
   },
 ]);
 
