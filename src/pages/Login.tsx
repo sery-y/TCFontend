@@ -1,10 +1,12 @@
-// src/pages/Login.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import logo from "../assets/logo.svg";
 
 export default function Login() {
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -12,9 +14,38 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const validateForm = (): boolean => {
+    let isValid = true;
+
+    // reset errors
+    setEmailError("");
+    setPasswordError("");
+
+    // email
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Invalid email format");
+      isValid = false;
+    }
+
+    // password
+    if (!password.trim()) {
+      setPasswordError("Password is required");
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      isValid = false;
+    }
+
+    return isValid;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setError("");
     setIsLoading(true);
 
@@ -42,6 +73,8 @@ export default function Login() {
 
       // ✅ Save auth data
       localStorage.setItem("token", data.access_token);
+
+      localStorage.setItem("userId", data.userId);
       localStorage.setItem("username", data.username);
       localStorage.setItem("userRole", data.role);
 
@@ -77,19 +110,30 @@ export default function Login() {
           <input
             type="email"
             placeholder="Email"
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${
+              emailError ? "border-red-500" : ""
+            }`}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+          {emailError && (
+            <p className="text-red-500 text-xs mt-1">{emailError}</p>
+          )}
 
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full border px-3 py-2 rounded pr-10"
+              className={`w-full border px-3 py-2 rounded pr-10 ${
+                passwordError ? "border-red-500" : ""
+              }`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            {passwordError && (
+              <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+            )}
+
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
