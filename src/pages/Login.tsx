@@ -42,7 +42,6 @@ export default function Login() {
 
       // ✅ Save auth data
       localStorage.setItem("token", data.access_token);
-      localStorage.setItem("userId", data.userId.toString());
       localStorage.setItem("username", data.username);
       localStorage.setItem("userRole", data.role);
 

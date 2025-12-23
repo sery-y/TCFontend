@@ -54,7 +54,7 @@ export default function Register() {
         body: JSON.stringify({
           name: `${firstName} ${familyName}`,
           email: email,
-          hashed_password: password, // ⚠️ EXACTEMENT CE NOM
+          password: password,
         }),
       });
 
