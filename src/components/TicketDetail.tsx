@@ -26,7 +26,7 @@ export default function TicketDetail({
   const [ticket, setTicket] = useState<ApiTicket | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const token = localStorage.getItem("token");
   // Fonction pour récupérer les détails du ticket
   const fetchTicketDetails = async () => {
     if (!ticketId) return;
@@ -40,6 +40,7 @@ export default function TicketDetail({
         {
           method: "GET",
           headers: {
+            Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
         }

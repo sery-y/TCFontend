@@ -1,22 +1,25 @@
 import { Navigate, Outlet } from "react-router-dom";
 
+type Role = "admin" | "agent" | "user";
+
 interface ProtectedRouteProps {
-  allowedRoles: string[]; // ["admin"], ["agent"], ["client"], etc.
+  allowedRoles: Role[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
-  // Récupère l'utilisateur depuis localStorage ou contexte
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
+export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+  const token = localStorage.getItem("token");
+  const userRole = localStorage.getItem("userRole") as Role | null;
 
-  // Si pas connecté → redirect to login
-  if (!user) return <Navigate to="/login" replace />;
+  // ❌ Not logged in
+  if (!token || !userRole) {
+    return <Navigate to="/login" replace />;
+  }
 
-  // Si rôle non autorisé → redirect home
-  if (!allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
+  // ❌ Logged in but wrong role
+  if (!allowedRoles.includes(userRole)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
-  // Sinon → render children (via Outlet)
+  // ✅ Authorized
   return <Outlet />;
-};
-
-export default ProtectedRoute;
+}

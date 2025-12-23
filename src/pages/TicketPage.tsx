@@ -1,3 +1,4 @@
+import TicketDetail from "../components/TicketDetail";
 import { useEffect, useState } from "react";
 import { User, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -10,6 +11,8 @@ interface Ticket {
 }
 
 export default function TicketsPage() {
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
+  const [showTicketDetail, setShowTicketDetail] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -194,6 +197,10 @@ export default function TicketsPage() {
             return (
               <div
                 key={ticket.id}
+                onClick={() => {
+                  setSelectedTicketId(ticket.id);
+                  setShowTicketDetail(true);
+                }}
                 className="bg-white p-6 rounded-2xl shadow hover:shadow-lg border relative"
               >
                 <div className="flex justify-between items-start">
@@ -256,6 +263,22 @@ export default function TicketsPage() {
           </div>
         )}
       </div>
+      {showTicketDetail && selectedTicketId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="p-6">
+              <TicketDetail
+                ticketId={selectedTicketId}
+                onClose={() => {
+                  setShowTicketDetail(false);
+                  setSelectedTicketId(null);
+                }}
+                showInModal={true}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

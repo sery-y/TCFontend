@@ -7,8 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import logo from "../assets/logo.svg";
+import useLogout from "../hooks/useLogout";
 
 export default function Navbar() {
+  const logout = useLogout();
   return (
     <nav className="w-full h-16 bg-white flex items-center justify-between px-6 shadow-md sticky top-0 z-50 ">
       {/* Logo */}
@@ -29,13 +31,7 @@ export default function Navbar() {
           align="end"
           className="bg-white rounded-md shadow-lg"
         >
-          <DropdownMenuItem
-            onClick={() => {
-              console.log("Logout clicked");
-            }}
-          >
-            Logout
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </nav>
