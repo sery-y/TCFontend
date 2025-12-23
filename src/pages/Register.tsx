@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROLES } from "../types/roleUser";
 import logo from "../assets/logo.svg";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -32,49 +32,87 @@ export default function Register() {
         !confirmPassword
       ) {
         setError("Please fill in all fields");
+        setIsLoading(false);
         return;
       }
 
       if (password.length < 8) {
         setError("Password must be at least 8 characters");
+        setIsLoading(false);
         return;
       }
 
       if (password !== confirmPassword) {
         setError("Passwords do not match");
+        setIsLoading(false);
         return;
       }
 
-      // 2️⃣ Appel API
-      const response = await fetch("http://127.0.0.1:8000/api/v1/users/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: `${firstName} ${familyName}`,
-          email: email,
-          hashed_password: password, // ⚠️ EXACTEMENT CE NOM
-        }),
+      // 2️⃣ Appel API pour créer l'utilisateur
+      const createResponse = await fetch(
+        "http://127.0.0.1:8000/api/v1/users/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: `${firstName} ${familyName}`,
+            email: email,
+            hashed_password: password,
+          }),
+        }
+      );
+
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json();
+        setError(errorData.detail || "Registration failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // 3️⃣ Si création réussie → login automatique
+      const loginBody = new URLSearchParams({
+        grant_type: "password",
+        username: email,
+        password: password,
       });
 
-      // 3️⃣ Gestion des erreurs API
-      if (!response.ok) {
-        const errorData = await response.json();
-
-        if (response.status === 422) {
-          setError("Invalid data. Please check your inputs.");
-        } else {
-          setError(errorData.detail || "Registration failed");
+      const loginResponse = await fetch(
+        "http://127.0.0.1:8000/api/v1/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: loginBody.toString(),
         }
+      );
+
+      const loginData = await loginResponse.json();
+
+      if (!loginResponse.ok) {
+        setError(loginData.detail || "Login after registration failed");
+        setIsLoading(false);
         return;
       }
 
-      // 4️⃣ Succès
-      const user = await response.json();
-      console.log("User created:", user);
+      // 4️⃣ Sauvegarde des infos d'authentification
+      localStorage.setItem("token", loginData.access_token);
+      localStorage.setItem("userId", loginData.userId);
+      localStorage.setItem("username", loginData.username);
+      localStorage.setItem("userRole", loginData.role);
 
-      navigate("/login");
+      // 5️⃣ Redirection selon le rôle
+      switch (loginData.role) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "agent":
+          navigate("/agent/dashboard");
+          break;
+        case "user":
+          navigate("/client/tickets");
+          break;
+        default:
+          navigate("/unauthorized");
+      }
     } catch (err) {
       console.error(err);
       setError("Server error. Please try again.");
